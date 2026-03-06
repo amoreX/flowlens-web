@@ -3,10 +3,9 @@
 import { useRef, useEffect } from "react";
 
 /**
- * Animation 3: Code Rain
- * Matrix-style columns of event names/code fall from top,
- * converge toward a central aperture, get absorbed. The aperture
- * glows brighter as it catches more traces.
+ * Animation: Code Rain
+ * Raw jargon text rains from top, gets attracted into center aperture,
+ * absorbed, then emitted out the bottom as styled event cards.
  */
 export function CodeRain() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -17,22 +16,55 @@ export function CodeRain() {
     const ctx = canvas.getContext("2d")!;
     let animId: number;
     let time = 0;
-    let absorbed = 0;
 
-    const words = [
-      "click", "fetch", "POST", "GET", "200", "404", "state",
-      "error", "warn", "log", "mount", "render", "effect",
-      "trace", "span", "req", "res", "hook", "fiber", "DOM",
-      "XHR", "ws://", ":9230", ":9229", "uuid", "async",
+    const jargon = [
+      "onClick", "fetch()", "setState", "console.log", "XHR", "error",
+      "useReducer", "dispatch", "render()", "response", "trace.id",
+      "req.headers", "DOM", "fiber", "mount", "unmount", "effect",
+      "promise", "async", "await", "hook[0]", "state", "props",
+      "event.target", "ws.send()", "HTTP 200", "POST /api",
     ];
 
-    interface Drop {
-      x: number; y: number; speed: number; text: string;
-      opacity: number; attracted: boolean; targetX: number;
+    const eventTypes = [
+      { label: "click", color: "59, 130, 246" },
+      { label: "fetch", color: "96, 165, 250" },
+      { label: "response", color: "96, 165, 250" },
+      { label: "setState", color: "74, 222, 128" },
+      { label: "console.log", color: "167, 139, 250" },
+      { label: "error", color: "248, 113, 113" },
+      { label: "POST /api", color: "251, 191, 36" },
+      { label: "render", color: "74, 222, 128" },
+      { label: "useEffect", color: "167, 139, 250" },
+      { label: "XHR", color: "96, 165, 250" },
+      { label: "mount", color: "74, 222, 128" },
+      { label: "HTTP 200", color: "59, 130, 246" },
+    ];
+
+    // Incoming raw jargon falling from top toward aperture
+    interface Incoming {
+      x: number;
+      y: number;
+      speed: number;
+      text: string;
+      opacity: number;
+      attracted: boolean;
     }
 
-    const drops: Drop[] = [];
-    const columns = 16;
+    // Outgoing styled cards emitted from aperture downward
+    interface Outgoing {
+      x: number;
+      y: number;
+      speed: number;
+      type: typeof eventTypes[0];
+      opacity: number;
+      driftX: number;
+    }
+
+    const incoming: Incoming[] = [];
+    const outgoing: Outgoing[] = [];
+    const inColumns = 14;
+    const outColumns = 10;
+    let absorbed = 0;
 
     function resize() {
       if (!canvas) return;
@@ -54,27 +86,26 @@ export function CodeRain() {
       ctx.clearRect(0, 0, w, h);
       time += 0.016;
 
-      // Spawn drops
-      if (Math.random() < 0.2) {
-        const col = Math.floor(Math.random() * columns);
-        const colW = w / columns;
-        drops.push({
+      // --- Spawn incoming jargon from top ---
+      if (Math.random() < 0.15) {
+        const col = Math.floor(Math.random() * inColumns);
+        const colW = w / inColumns;
+        incoming.push({
           x: col * colW + colW / 2,
           y: -10,
-          speed: 0.8 + Math.random() * 1.2,
-          text: words[Math.floor(Math.random() * words.length)],
-          opacity: 0.3 + Math.random() * 0.5,
+          speed: 0.7 + Math.random() * 1.0,
+          text: jargon[Math.floor(Math.random() * jargon.length)],
+          opacity: 0.3 + Math.random() * 0.4,
           attracted: false,
-          targetX: col * colW + colW / 2,
         });
       }
 
-      // Draw drops
-      for (let i = drops.length - 1; i >= 0; i--) {
-        const d = drops[i];
+      // --- Update & draw incoming ---
+      for (let i = incoming.length - 1; i >= 0; i--) {
+        const d = incoming[i];
 
-        // When past halfway, start attracting to center
-        if (d.y > cy * 0.5 && !d.attracted) {
+        // Start attracting when close enough to aperture
+        if (d.y > cy * 0.45 && !d.attracted) {
           d.attracted = true;
         }
 
@@ -82,44 +113,105 @@ export function CodeRain() {
           const dx = cx - d.x;
           const dy = cy - d.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist > 20) {
-            d.x += (dx / dist) * d.speed * 1.5;
-            d.y += (dy / dist) * d.speed * 1.5;
+          if (dist > 22) {
+            d.x += (dx / dist) * d.speed * 1.8;
+            d.y += (dy / dist) * d.speed * 1.8;
           } else {
-            // Absorbed
-            absorbed = Math.min(1, absorbed + 0.03);
-            drops.splice(i, 1);
+            // Absorbed — spawn an outgoing card
+            absorbed = Math.min(1, absorbed + 0.04);
+            const col = Math.floor(Math.random() * outColumns);
+            const colW = w / outColumns;
+            const et = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+            outgoing.push({
+              x: cx,
+              y: cy + 24,
+              speed: 0.5 + Math.random() * 0.7,
+              type: et,
+              opacity: 0,
+              driftX: col * colW + colW / 2,
+            });
+            incoming.splice(i, 1);
             continue;
           }
-          d.opacity -= 0.003;
+          d.opacity -= 0.002;
         } else {
           d.y += d.speed;
         }
 
         if (d.y > h + 10 || d.opacity <= 0) {
-          drops.splice(i, 1);
+          incoming.splice(i, 1);
           continue;
         }
 
+        // Draw raw jargon text
         ctx.font = "10px 'JetBrains Mono', monospace";
         ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
         ctx.fillStyle = d.attracted
           ? `rgba(59, 130, 246, ${d.opacity})`
-          : `rgba(100, 116, 139, ${d.opacity * 0.6})`;
+          : `rgba(100, 116, 139, ${d.opacity * 0.7})`;
         ctx.fillText(d.text, d.x, d.y);
       }
 
-      // Absorbed glow fades over time
-      absorbed = Math.max(0, absorbed - 0.005);
+      // --- Update & draw outgoing cards ---
+      for (let i = outgoing.length - 1; i >= 0; i--) {
+        const d = outgoing[i];
 
-      // Center aperture
+        d.y += d.speed;
+        d.x += (d.driftX - d.x) * 0.04;
+
+        // Fade in then fade out near bottom
+        const fadeInEnd = cy + 90;
+        const fadeOutStart = h - 60;
+        if (d.y < fadeInEnd) {
+          d.opacity = Math.min(0.85, d.opacity + 0.04);
+        } else if (d.y > fadeOutStart) {
+          d.opacity -= 0.012;
+        } else {
+          d.opacity = Math.min(0.85, d.opacity + 0.01);
+        }
+
+        if (d.y > h + 20 || d.opacity <= 0) {
+          outgoing.splice(i, 1);
+          continue;
+        }
+
+        // Draw styled event card
+        ctx.save();
+        ctx.translate(d.x, d.y);
+        ctx.font = "9px 'JetBrains Mono', monospace";
+        const tw = ctx.measureText(d.type.label).width + 10;
+
+        ctx.fillStyle = `rgba(20, 24, 39, ${d.opacity * 0.9})`;
+        ctx.strokeStyle = `rgba(${d.type.color}, ${d.opacity * 0.5})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.roundRect(-tw / 2, -8, tw, 16, 3);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = `rgba(${d.type.color}, ${d.opacity * 0.7})`;
+        ctx.beginPath();
+        ctx.roundRect(-tw / 2, -8, 2, 16, [3, 0, 0, 3]);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(${d.type.color}, ${d.opacity})`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(d.type.label, 1, 0);
+        ctx.restore();
+      }
+
+      // --- Absorbed glow fades ---
+      absorbed = Math.max(0, absorbed - 0.006);
+
+      // --- Center aperture ---
       ctx.save();
       ctx.translate(cx, cy);
 
-      // Absorption glow
-      const glowR = 50 + absorbed * 20;
+      const glowR = 45 + absorbed * 15;
       const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, glowR);
-      grad.addColorStop(0, `rgba(59, 130, 246, ${0.1 + absorbed * 0.2})`);
+      grad.addColorStop(0, `rgba(59, 130, 246, ${0.1 + absorbed * 0.15})`);
       grad.addColorStop(0.5, `rgba(59, 130, 246, ${0.03 + absorbed * 0.05})`);
       grad.addColorStop(1, "rgba(59, 130, 246, 0)");
       ctx.fillStyle = grad;
@@ -127,7 +219,6 @@ export function CodeRain() {
       ctx.arc(0, 0, glowR, 0, Math.PI * 2);
       ctx.fill();
 
-      // Aperture
       ctx.rotate(time * 0.4 + absorbed * 2);
       ctx.beginPath();
       ctx.arc(0, 0, 22, 0, Math.PI * 2);
