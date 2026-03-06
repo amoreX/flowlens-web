@@ -81,7 +81,7 @@ export function GetStartedSection() {
         Follow these steps to start tracing your full-stack app.
       </motion.p>
 
-      <motion.div variants={stagger} className="grid md:grid-cols-3 gap-10 md:gap-6">
+      <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
         {/* Step 1: Install */}
         <motion.div variants={fadeUp}>
           <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">

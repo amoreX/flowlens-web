@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Zap, GitBranch, Code2, Terminal } from "lucide-react";
 
 const features = [
@@ -39,11 +39,25 @@ function VideoPlaceholder({ title }: { title: string }) {
   );
 }
 
+function useIsDesktop() {
+  const [desktop, setDesktop] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    setDesktop(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setDesktop(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return desktop;
+}
+
 export function CapabilitiesSection() {
   const [active, setActive] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
+    if (!isDesktop) return;
     function onScroll() {
       const wrapper = wrapperRef.current;
       if (!wrapper) return;
@@ -70,18 +84,18 @@ export function CapabilitiesSection() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [isDesktop]);
 
   return (
-    <div ref={wrapperRef} style={{ height: `${features.length * 100}vh` }}>
-      <div className="sticky top-0 h-screen flex items-center">
+    <div ref={wrapperRef} style={{ height: isDesktop ? `${features.length * 100}vh` : "auto" }}>
+      <div className={isDesktop ? "sticky top-0 h-screen flex items-center" : "py-16"}>
         <div className="mx-auto w-full max-w-[1300px] px-4">
           <div className="mb-10">
             <p className="section-label mb-3">capabilities</p>
             <h2 className="font-serif text-3xl font-bold">Everything you need to trace full-stack behavior</h2>
           </div>
-          <div className="flex gap-8">
-            <div className="flex flex-col gap-3 w-[320px] shrink-0">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+            <div className="flex flex-col gap-3 md:w-[320px] shrink-0">
               {features.map((f, i) => (
                 <button
                   key={i}
@@ -95,12 +109,12 @@ export function CapabilitiesSection() {
                   <div className={`mb-2.5 ${active === i ? "text-accent" : "text-text-muted"}`}>{f.icon}</div>
                   <h4 className="font-serif font-semibold text-base mb-1">{f.title}</h4>
                   <p className={`text-sm leading-relaxed transition-all duration-300 ${
-                    active === i ? "text-text max-h-24 opacity-100" : "text-text-muted max-h-0 opacity-0 overflow-hidden"
-                  }`}>{f.desc}</p>
+                    active === i ? "text-text max-h-24 opacity-100" : "text-text-muted max-h-0 md:max-h-0 opacity-0 overflow-hidden"
+                  } max-md:max-h-24 max-md:opacity-100`}>{f.desc}</p>
                 </button>
               ))}
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 hidden md:block">
               <VideoPlaceholder title={features[active].title} />
             </div>
           </div>
