@@ -1,0 +1,177 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0c0f1a;
+  --color-bg-card: #141827;
+  --color-bg-elevated: #1a1f33;
+  --color-accent: #3b82f6;
+  --color-accent-dim: rgba(59, 130, 246, 0.15);
+  --color-accent-glow: rgba(59, 130, 246, 0.08);
+  --color-secondary: #60a5fa;
+  --color-text: #c9cdd5;
+  --color-text-heading: #f0f2f5;
+  --color-text-muted: #64748b;
+  --color-text-dim: #475569;
+  --color-border: #1e293b;
+  --color-border-hover: #334155;
+  --color-code-bg: #0a0d16;
+
+  --font-serif: "Crimson Pro", Georgia, serif;
+  --font-mono: "JetBrains Mono", "Consolas", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  color: var(--color-text-heading);
+}
+
+code, pre { font-family: var(--font-mono); }
+
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #f0f2f5;
+}
+
+.section-label {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.section-label::before {
+  content: "// ";
+  opacity: 0.5;
+}
+
+.card-hover {
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.card-hover:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 24px var(--color-accent-glow), inset 0 0 24px var(--color-accent-glow);
+}
+
+.code-block {
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+.code-block .keyword { color: var(--color-accent); }
+.code-block .string { color: var(--color-secondary); }
+.code-block .comment { color: var(--color-text-muted); font-style: italic; }
+.code-block .punct { color: #475569; }
+.code-block .fn { color: #a78bfa; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.4s ease forwards; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+/* Animated Logo */
+@keyframes logoSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoPulse {
+  0%, 100% { opacity: 0; r: 3; }
+  50% { opacity: 0.15; r: 5; }
+}
+
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3)); }
+  50% { filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.6)); }
+}
+
+.animated-logo {
+  animation: logoGlow 3s ease-in-out infinite;
+  overflow: visible;
+}
+
+.animated-logo .logo-ring {
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.animated-logo .logo-blades {
+  transform-origin: 12px 12px;
+  animation: logoSpin 20s linear infinite;
+}
+
+.animated-logo .logo-core {
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+.group:hover .animated-logo .logo-blades {
+  animation-duration: 4s;
+}
+
+.group:hover .animated-logo .logo-ring {
+  opacity: 0.8;
+}
+
+.group:hover .animated-logo {
+  filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.7));
+}
+
+/* Animation toggle */
+.anim-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+}
+
+.anim-toggle button {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+
+.anim-toggle button:hover {
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+}
+
+.anim-toggle button.active {
+  background: var(--color-accent);
+  color: white;
+}
