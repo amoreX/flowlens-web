@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { AnimatedLogo } from "./AnimatedLogo";
+import { ThemeToggle } from "./ThemeToggle";
 import { useState, useEffect } from "react";
 
 const navLinks = [
   { href: "/", label: "Home", key: "h" },
-  { href: "/features", label: "Features", key: "f" },
   { href: "/docs", label: "Docs", key: "d" },
   { href: "/sdk", label: "SDK", key: "s" },
 ];
@@ -60,10 +60,13 @@ export function Navbar() {
           })}
         </div>
 
-        <a href="https://github.com/amoreX/flowlens" target="_blank" rel="noopener noreferrer"
-          className="hidden md:block text-text-muted hover:text-text transition-colors duration-200 text-sm cursor-pointer">
-          GitHub
-        </a>
+        <div className="hidden md:flex items-center gap-2">
+          <ThemeToggle />
+          <a href="https://github.com/amoreX/flowlens" target="_blank" rel="noopener noreferrer"
+            className="text-text-muted hover:text-text transition-colors duration-200 text-sm cursor-pointer">
+            GitHub
+          </a>
+        </div>
 
         <button onClick={() => setMobileOpen(!mobileOpen)}
           className="md:hidden text-text-muted hover:text-text cursor-pointer" aria-label="Toggle menu">

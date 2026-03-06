@@ -104,6 +104,27 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
     let animId: number;
     let time = 0;
 
+    // Read accent color from CSS variable for aperture rendering
+    function getAccentRGB(): string {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue("--color-accent").trim();
+      // Parse hex to r,g,b
+      if (raw.startsWith("#")) {
+        const hex = raw.slice(1);
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        return `${r}, ${g}, ${b}`;
+      }
+      return "59, 130, 246";
+    }
+    function isLightMode(): boolean {
+      return document.documentElement.getAttribute("data-theme") === "light";
+    }
+    let accentRGB = getAccentRGB();
+    let light = isLightMode();
+    const themeObserver = new MutationObserver(() => { accentRGB = getAccentRGB(); light = isLightMode(); });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
     interface Incoming {
       x: number;
       y: number;
@@ -209,8 +230,10 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = d.attracted
-          ? `rgba(59, 130, 246, ${d.opacity})`
-          : `rgba(100, 116, 139, ${d.opacity * 0.7})`;
+          ? `rgba(${accentRGB}, ${light ? d.opacity * 1.2 : d.opacity})`
+          : light
+            ? `rgba(51, 65, 85, ${d.opacity * 0.9})`
+            : `rgba(100, 116, 139, ${d.opacity * 0.7})`;
         ctx.fillText(d.text, d.x, d.y);
       }
 
@@ -241,8 +264,10 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
         ctx.font = "9px 'JetBrains Mono', monospace";
         const tw = ctx.measureText(d.type.label).width + 10;
 
-        ctx.fillStyle = `rgba(20, 24, 39, ${d.opacity * 0.9})`;
-        ctx.strokeStyle = `rgba(${d.type.color}, ${d.opacity * 0.5})`;
+        ctx.fillStyle = light
+          ? `rgba(255, 255, 255, ${d.opacity * 0.9})`
+          : `rgba(20, 24, 39, ${d.opacity * 0.9})`;
+        ctx.strokeStyle = `rgba(${d.type.color}, ${light ? d.opacity * 0.8 : d.opacity * 0.5})`;
         ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.roundRect(-tw / 2, -8, tw, 16, 3);
@@ -268,11 +293,12 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
       ctx.save();
       ctx.translate(cx, cy);
 
+      const lb = light ? 1.8 : 1; // light mode boost
       const glowR = 45 + absorbed * 15;
       const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, glowR);
-      grad.addColorStop(0, `rgba(59, 130, 246, ${0.1 + absorbed * 0.15})`);
-      grad.addColorStop(0.5, `rgba(59, 130, 246, ${0.03 + absorbed * 0.05})`);
-      grad.addColorStop(1, "rgba(59, 130, 246, 0)");
+      grad.addColorStop(0, `rgba(${accentRGB}, ${(0.1 + absorbed * 0.15) * lb})`);
+      grad.addColorStop(0.5, `rgba(${accentRGB}, ${(0.03 + absorbed * 0.05) * lb})`);
+      grad.addColorStop(1, `rgba(${accentRGB}, 0)`);
       ctx.fillStyle = grad;
       ctx.beginPath();
       ctx.arc(0, 0, glowR, 0, Math.PI * 2);
@@ -283,8 +309,8 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
 
       ctx.beginPath();
       ctx.arc(0, 0, 10 * s, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(59, 130, 246, ${0.4 + absorbed * 0.4})`;
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = `rgba(${accentRGB}, ${(0.4 + absorbed * 0.4) * lb})`;
+      ctx.lineWidth = light ? 2 : 1.5;
       ctx.stroke();
 
       const blades: [number, number, number, number][] = [
@@ -295,15 +321,15 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
         [14.31 - 12, 16 - 12, 14.31 - 11.48 - 12, 16 - 12],
         [16.62 - 12, 12 - 12, 16.62 - 5.74 - 12, 12 + 9.94 - 12],
       ];
-      const bladeAlpha = 0.3 + absorbed * 0.4;
+      const bladeAlpha = (0.3 + absorbed * 0.4) * lb;
       ctx.lineCap = "round";
       for (let i = 0; i < blades.length; i++) {
         const [x1, y1, x2, y2] = blades[i];
         ctx.beginPath();
         ctx.moveTo(x1 * s, y1 * s);
         ctx.lineTo(x2 * s, y2 * s);
-        ctx.strokeStyle = `rgba(59, 130, 246, ${bladeAlpha + Math.sin(time * 3 + i) * 0.1})`;
-        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = `rgba(${accentRGB}, ${bladeAlpha + Math.sin(time * 3 + i) * 0.1})`;
+        ctx.lineWidth = light ? 2 : 1.5;
         ctx.stroke();
       }
       ctx.restore();
@@ -315,6 +341,7 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
+      themeObserver.disconnect();
     };
   }, []);
 

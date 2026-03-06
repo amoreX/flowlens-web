@@ -9,7 +9,7 @@ export function HeroSection() {
     <section className="mx-auto max-w-[1300px] px-4 pt-12 pb-6">
       <div className="grid md:grid-cols-2 gap-8 items-stretch min-h-[520px]">
         <div className="flex flex-col justify-center">
-          <p className="section-label mb-5">full-stack tracing</p>
+          <p className="section-label mb-5">Your mom can debug faster now</p>
           <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-bold leading-[1.1] mb-6 text-text-heading">
             See every trace.<br />
             <span className="text-accent">Debug any flow.</span>
@@ -20,7 +20,7 @@ export function HeroSection() {
           </p>
           <div className="flex flex-wrap gap-4">
             <Link href="/docs"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-accent text-white font-mono font-medium text-sm rounded-md hover:brightness-110 transition cursor-pointer">
+              className="cta-primary inline-flex items-center gap-2 px-6 py-2.5 font-mono font-medium text-sm rounded-md hover:brightness-110 transition cursor-pointer">
               Get Started <ArrowRight size={16} />
             </Link>
             <Link href="/features"
