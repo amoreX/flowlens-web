@@ -15,7 +15,7 @@ const sidebarItems = [
 
 export default function DocsPage() {
   return (
-    <div className="mx-auto max-w-[1000px] px-6 pt-20 pb-20">
+    <div className="mx-auto max-w-[1300px] px-4 pt-12 pb-12">
       <p className="section-label mb-4">documentation</p>
       <h1 className="font-serif text-3xl md:text-4xl font-bold mb-4">Documentation</h1>
       <p className="text-text-muted leading-relaxed mb-12">

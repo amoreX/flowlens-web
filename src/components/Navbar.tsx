@@ -37,7 +37,7 @@ export function Navbar() {
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-bg/95 backdrop-blur-sm">
-      <div className="mx-auto max-w-[1000px] px-6 flex items-center justify-between h-14">
+      <div className="mx-auto max-w-[1300px] px-4 flex items-center justify-between h-14">
         <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
           <AnimatedLogo size={18} />
           <span className="font-serif text-lg font-bold text-text-heading tracking-tight">FlowLens</span>

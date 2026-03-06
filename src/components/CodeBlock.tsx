@@ -31,7 +31,7 @@ export function CodeBlock({ code, language }: { code: string; language?: string 
         aria-label="Copy code">
         {copied ? <Check size={14} /> : <Copy size={14} />}
       </button>
-      <pre className="code-block">
+      <pre className="code-block" style={language ? { paddingTop: "2.5rem" } : undefined}>
         <code dangerouslySetInnerHTML={{ __html: highlight(code) }} />
       </pre>
     </div>

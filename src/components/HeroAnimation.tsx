@@ -2,10 +2,10 @@
 
 import { CodeRain } from "./animations/CodeRain";
 
-export function HeroAnimation() {
+export function HeroAnimation({ platform = "all" }: { platform?: "all" | "react" | "node" }) {
   return (
     <div
-      className="relative w-full flex-1 min-h-0"
+      className="w-full h-full"
       style={{
         maskImage: "linear-gradient(to right, transparent, black 60px, black calc(100% - 60px), transparent), linear-gradient(to bottom, transparent, black 50px, black calc(100% - 50px), transparent)",
         maskComposite: "intersect",
@@ -13,7 +13,7 @@ export function HeroAnimation() {
         WebkitMaskComposite: "source-in",
       }}
     >
-      <CodeRain />
+      <CodeRain platform={platform} />
     </div>
   );
 }

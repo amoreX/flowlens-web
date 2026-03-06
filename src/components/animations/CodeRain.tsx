@@ -2,30 +2,21 @@
 
 import { useRef, useEffect } from "react";
 
-/**
- * Animation: Code Rain
- * Raw jargon text rains from top, gets attracted into center aperture,
- * absorbed, then emitted out the bottom as styled event cards.
- */
-export function CodeRain() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+type Platform = "all" | "react" | "node";
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d")!;
-    let animId: number;
-    let time = 0;
-
-    const jargon = [
+const platformData: Record<Platform, {
+  jargon: string[];
+  events: { label: string; color: string }[];
+}> = {
+  all: {
+    jargon: [
       "onClick", "fetch()", "setState", "console.log", "XHR", "error",
       "useReducer", "dispatch", "render()", "response", "trace.id",
       "req.headers", "DOM", "fiber", "mount", "unmount", "effect",
       "promise", "async", "await", "hook[0]", "state", "props",
       "event.target", "ws.send()", "HTTP 200", "POST /api",
-    ];
-
-    const eventTypes = [
+    ],
+    events: [
       { label: "click", color: "59, 130, 246" },
       { label: "fetch", color: "96, 165, 250" },
       { label: "response", color: "96, 165, 250" },
@@ -38,9 +29,81 @@ export function CodeRain() {
       { label: "XHR", color: "96, 165, 250" },
       { label: "mount", color: "74, 222, 128" },
       { label: "HTTP 200", color: "59, 130, 246" },
-    ];
+    ],
+  },
+  react: {
+    jargon: [
+      "useState", "useEffect", "useRef", "useMemo", "useCallback",
+      "useReducer", "useContext", "setState", "forceUpdate",
+      "render()", "re-render", "fiber", "reconciler", "virtual DOM",
+      "JSX", "props", "children", "key={id}", "React.memo",
+      "Suspense", "lazy()", "ErrorBoundary", "portal",
+      "onClick", "onChange", "onSubmit", "event.target",
+      "console.log", "console.warn", "console.error",
+      "component", "mount", "unmount", "cleanup",
+    ],
+    events: [
+      { label: "useState", color: "74, 222, 128" },
+      { label: "useEffect", color: "167, 139, 250" },
+      { label: "onClick", color: "59, 130, 246" },
+      { label: "render", color: "74, 222, 128" },
+      { label: "setState", color: "74, 222, 128" },
+      { label: "re-render", color: "251, 191, 36" },
+      { label: "console.log", color: "167, 139, 250" },
+      { label: "error", color: "248, 113, 113" },
+      { label: "onSubmit", color: "59, 130, 246" },
+      { label: "mount", color: "74, 222, 128" },
+      { label: "unmount", color: "248, 113, 113" },
+      { label: "useRef", color: "96, 165, 250" },
+    ],
+  },
+  node: {
+    jargon: [
+      "app.get()", "app.post()", "router.use()", "middleware",
+      "req.body", "req.params", "req.headers", "res.json()",
+      "res.status()", "next()", "express()", "fastify",
+      "process.env", "cors()", "helmet()", "rate-limit",
+      "db.query()", "prisma.find()", "mongoose.save()",
+      "jwt.verify()", "bcrypt.hash()", "auth()",
+      "try/catch", "throw Error", "500", "404", "200",
+      "async/await", "Promise.all", "EventEmitter",
+      "fs.readFile", "stream.pipe", "Buffer",
+    ],
+    events: [
+      { label: "GET /api", color: "59, 130, 246" },
+      { label: "POST /api", color: "251, 191, 36" },
+      { label: "middleware", color: "167, 139, 250" },
+      { label: "db.query", color: "96, 165, 250" },
+      { label: "res.json()", color: "74, 222, 128" },
+      { label: "auth()", color: "251, 191, 36" },
+      { label: "500 error", color: "248, 113, 113" },
+      { label: "req.body", color: "96, 165, 250" },
+      { label: "next()", color: "167, 139, 250" },
+      { label: "jwt.verify", color: "74, 222, 128" },
+      { label: "404", color: "248, 113, 113" },
+      { label: "200 OK", color: "59, 130, 246" },
+    ],
+  },
+};
 
-    // Incoming raw jargon falling from top toward aperture
+/**
+ * Animation: Code Rain
+ * Raw jargon text rains from top, gets attracted into center aperture,
+ * absorbed, then emitted out the bottom as styled event cards.
+ * Platform prop swaps the jargon and event types.
+ */
+export function CodeRain({ platform = "all" }: { platform?: Platform }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const platformRef = useRef(platform);
+  platformRef.current = platform;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+    let animId: number;
+    let time = 0;
+
     interface Incoming {
       x: number;
       y: number;
@@ -50,12 +113,11 @@ export function CodeRain() {
       attracted: boolean;
     }
 
-    // Outgoing styled cards emitted from aperture downward
     interface Outgoing {
       x: number;
       y: number;
       speed: number;
-      type: typeof eventTypes[0];
+      type: { label: string; color: string };
       opacity: number;
       driftX: number;
     }
@@ -83,6 +145,8 @@ export function CodeRain() {
       const cx = w / 2;
       const cy = h / 2;
 
+      const data = platformData[platformRef.current];
+
       ctx.clearRect(0, 0, w, h);
       time += 0.016;
 
@@ -94,7 +158,7 @@ export function CodeRain() {
           x: col * colW + colW / 2,
           y: -10,
           speed: 0.7 + Math.random() * 1.0,
-          text: jargon[Math.floor(Math.random() * jargon.length)],
+          text: data.jargon[Math.floor(Math.random() * data.jargon.length)],
           opacity: 0.3 + Math.random() * 0.4,
           attracted: false,
         });
@@ -104,7 +168,6 @@ export function CodeRain() {
       for (let i = incoming.length - 1; i >= 0; i--) {
         const d = incoming[i];
 
-        // Start attracting when close enough to aperture
         if (d.y > cy * 0.45 && !d.attracted) {
           d.attracted = true;
         }
@@ -117,11 +180,10 @@ export function CodeRain() {
             d.x += (dx / dist) * d.speed * 1.8;
             d.y += (dy / dist) * d.speed * 1.8;
           } else {
-            // Absorbed — spawn an outgoing card
             absorbed = Math.min(1, absorbed + 0.04);
             const col = Math.floor(Math.random() * outColumns);
             const colW = w / outColumns;
-            const et = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+            const et = data.events[Math.floor(Math.random() * data.events.length)];
             outgoing.push({
               x: cx,
               y: cy + 24,
@@ -143,7 +205,6 @@ export function CodeRain() {
           continue;
         }
 
-        // Draw raw jargon text
         ctx.font = "10px 'JetBrains Mono', monospace";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -160,7 +221,6 @@ export function CodeRain() {
         d.y += d.speed;
         d.x += (d.driftX - d.x) * 0.04;
 
-        // Fade in then fade out near bottom
         const fadeInEnd = cy + 90;
         const fadeOutStart = h - 60;
         if (d.y < fadeInEnd) {
@@ -176,7 +236,6 @@ export function CodeRain() {
           continue;
         }
 
-        // Draw styled event card
         ctx.save();
         ctx.translate(d.x, d.y);
         ctx.font = "9px 'JetBrains Mono', monospace";
@@ -205,7 +264,7 @@ export function CodeRain() {
       // --- Absorbed glow fades ---
       absorbed = Math.max(0, absorbed - 0.006);
 
-      // --- Center aperture ---
+      // --- Center aperture (matches AnimatedLogo SVG) ---
       ctx.save();
       ctx.translate(cx, cy);
 
@@ -219,19 +278,31 @@ export function CodeRain() {
       ctx.arc(0, 0, glowR, 0, Math.PI * 2);
       ctx.fill();
 
+      const s = 22 / 10;
       ctx.rotate(time * 0.4 + absorbed * 2);
+
       ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
+      ctx.arc(0, 0, 10 * s, 0, Math.PI * 2);
       ctx.strokeStyle = `rgba(59, 130, 246, ${0.4 + absorbed * 0.4})`;
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2;
+      const blades: [number, number, number, number][] = [
+        [14.31 - 12, 8 - 12, 14.31 + 5.74 - 12, 8 + 9.94 - 12],
+        [9.69 - 12, 8 - 12, 9.69 + 11.48 - 12, 8 - 12],
+        [7.38 - 12, 12 - 12, 7.38 + 5.74 - 12, 12 - 9.94 - 12],
+        [9.69 - 12, 16 - 12, 9.69 - 5.74 - 12, 16 - 9.94 - 12],
+        [14.31 - 12, 16 - 12, 14.31 - 11.48 - 12, 16 - 12],
+        [16.62 - 12, 12 - 12, 16.62 - 5.74 - 12, 12 + 9.94 - 12],
+      ];
+      const bladeAlpha = 0.3 + absorbed * 0.4;
+      ctx.lineCap = "round";
+      for (let i = 0; i < blades.length; i++) {
+        const [x1, y1, x2, y2] = blades[i];
         ctx.beginPath();
-        ctx.moveTo(Math.cos(a) * 9, Math.sin(a) * 9);
-        ctx.lineTo(Math.cos(a + 0.8) * 22, Math.sin(a + 0.8) * 22);
-        ctx.strokeStyle = `rgba(59, 130, 246, ${0.3 + absorbed * 0.4 + Math.sin(time * 3 + i) * 0.1})`;
+        ctx.moveTo(x1 * s, y1 * s);
+        ctx.lineTo(x2 * s, y2 * s);
+        ctx.strokeStyle = `rgba(59, 130, 246, ${bladeAlpha + Math.sin(time * 3 + i) * 0.1})`;
         ctx.lineWidth = 1.5;
         ctx.stroke();
       }

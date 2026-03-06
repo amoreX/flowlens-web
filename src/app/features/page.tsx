@@ -15,7 +15,7 @@ const features = [
 export default function FeaturesPage() {
   return (
     <div>
-      <section className="mx-auto max-w-[1000px] px-6 pt-24 pb-8">
+      <section className="mx-auto max-w-[1300px] px-4 pt-24 pb-8">
         <p className="section-label mb-4">capabilities</p>
         <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Features</h1>
         <p className="text-text-muted max-w-xl leading-relaxed">
@@ -23,7 +23,7 @@ export default function FeaturesPage() {
         </p>
       </section>
 
-      <section className="mx-auto max-w-[1000px] px-6 pb-20">
+      <section className="mx-auto max-w-[1300px] px-4 pb-12">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((f) => (
             <div key={f.title} className="border border-border p-5 rounded-lg card-hover cursor-default">

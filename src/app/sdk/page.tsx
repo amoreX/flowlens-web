@@ -15,7 +15,7 @@ export default function SdkPage() {
   const [active, setActive] = useState<Tab>("web");
 
   return (
-    <div className="mx-auto max-w-[1000px] px-6 pt-20 pb-20">
+    <div className="mx-auto max-w-[1300px] px-4 pt-12 pb-12">
       <Link href="/docs" className="inline-flex items-center gap-1 text-text-muted text-xs hover:text-accent transition-colors mb-8 cursor-pointer">
         <ArrowLeft size={12} /> Back to docs
       </Link>
