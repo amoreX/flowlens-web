@@ -92,7 +92,7 @@ const platformData: Record<Platform, {
  * absorbed, then emitted out the bottom as styled event cards.
  * Platform prop swaps the jargon and event types.
  */
-export function CodeRain({ platform = "all" }: { platform?: Platform }) {
+export function CodeRain({ platform = "all", delay = 0 }: { platform?: Platform; delay?: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const platformRef = useRef(platform);
   platformRef.current = platform;
@@ -337,13 +337,14 @@ export function CodeRain({ platform = "all" }: { platform?: Platform }) {
       animId = requestAnimationFrame(draw);
     }
 
-    draw();
+    const delayTimer = setTimeout(() => draw(), delay);
     return () => {
+      clearTimeout(delayTimer);
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
       themeObserver.disconnect();
     };
-  }, []);
+  }, [delay]);
 
   return <canvas ref={canvasRef} className="w-full h-full" />;
 }

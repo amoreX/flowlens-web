@@ -2,7 +2,7 @@
 
 import { CodeRain } from "./animations/CodeRain";
 
-export function HeroAnimation({ platform = "all" }: { platform?: "all" | "react" | "node" }) {
+export function HeroAnimation({ platform = "all", delay = 0 }: { platform?: "all" | "react" | "node"; delay?: number }) {
   return (
     <div
       className="w-full h-full"
@@ -13,7 +13,7 @@ export function HeroAnimation({ platform = "all" }: { platform?: "all" | "react"
         WebkitMaskComposite: "source-in",
       }}
     >
-      <CodeRain platform={platform} />
+      <CodeRain platform={platform} delay={delay} />
     </div>
   );
 }
