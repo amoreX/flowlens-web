@@ -23,15 +23,15 @@ const installCmds: Record<PkgManager, string> = {
   pnpm: "pnpm add @nihal/flowlens-web @nihal/flowlens-node",
 };
 
-const initCode = `import { FlowLensWeb } from "@nihal/flowlens-web";
+const initCode = `import { init } from "@nihal/flowlens-web";
 
 // In your app's entry point
-FlowLensWeb.init();`;
+init();`;
 
 const nodeCode = `import { flowlens } from "@nihal/flowlens-node";
 
-// Wrap your Express/Fastify handler
-app.use(flowlens());`;
+// Wrap your Express handler
+app.use(flowlens({ serviceName: "my-api" }));`;
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -128,7 +128,7 @@ export function GetStartedSection() {
               <h3 className="font-serif font-semibold text-lg">Add to your app</h3>
             </div>
             <p className="text-text-muted text-sm leading-relaxed mb-5">
-              Import and initialize <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">FlowLensWeb.init()</code> in
+              Import and call <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">init()</code> in
               your frontend entry point.
             </p>
             <div className="border border-border rounded-lg overflow-hidden">
@@ -139,15 +139,13 @@ export function GetStartedSection() {
               <pre className="px-4 py-3 font-mono text-xs leading-relaxed overflow-x-auto scrollbar-none">
                 <code>
                   <span className="text-pink-400">import</span>{" "}
-                  <span className="text-text">{"{ FlowLensWeb }"}</span>{" "}
+                  <span className="text-text">{"{ init }"}</span>{" "}
                   <span className="text-pink-400">from</span>{" "}
                   <span className="text-green-400">{'"@nihal/flowlens-web"'}</span>
                   <span className="text-text-dim">;</span>
                   {"\n\n"}
                   <span className="text-text-dim">{"// In your app's entry point"}</span>
                   {"\n"}
-                  <span className="text-text">FlowLensWeb</span>
-                  <span className="text-text-dim">.</span>
                   <span className="text-blue-400">init</span>
                   <span className="text-text-dim">();</span>
                 </code>
@@ -187,7 +185,11 @@ export function GetStartedSection() {
                   <span className="text-blue-400">use</span>
                   <span className="text-text-dim">(</span>
                   <span className="text-blue-400">flowlens</span>
-                  <span className="text-text-dim">());</span>
+                  <span className="text-text-dim">({"{ "}</span>
+                  <span className="text-text">serviceName</span>
+                  <span className="text-text-dim">{": "}</span>
+                  <span className="text-green-400">{'"my-api"'}</span>
+                  <span className="text-text-dim">{" }"});</span>
                 </code>
               </pre>
             </div>

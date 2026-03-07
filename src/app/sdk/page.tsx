@@ -123,7 +123,7 @@ export default function SdkPage() {
           <section>
             <h2 className="font-serif text-xl font-bold mb-4">Fastify</h2>
             <p className="text-sm text-text-muted mb-4">Use <code className="text-secondary">flowlensFastify()</code> plugin for Fastify servers.</p>
-            <CodeBlock language="typescript" code={`import Fastify from 'fastify'\nimport { flowlensFastify } from '@nihal/flowlens-node'\n\nconst app = Fastify()\n\napp.register(flowlensFastify, {\n  serviceName: 'my-api'\n})\n\napp.get('/api/users', async () => {\n  return { users: [] }\n})\n\napp.listen({ port: 3000 })`} />
+            <CodeBlock language="typescript" code={`import Fastify from 'fastify'\nimport { flowlensFastify } from '@nihal/flowlens-node'\n\nconst app = Fastify()\n\napp.register(flowlensFastify({\n  serviceName: 'my-api'\n}))\n\napp.get('/api/users', async () => {\n  return { users: [] }\n})\n\napp.listen({ port: 3000 })`} />
           </section>
           <section>
             <h2 className="font-serif text-xl font-bold mb-4">Raw HTTP</h2>
