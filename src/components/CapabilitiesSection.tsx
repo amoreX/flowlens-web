@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Zap, GitBranch, Code2, Terminal, MousePointer } from "lucide-react";
+import { FeatureAnimation } from "./FeatureAnimation";
 
 const features = [
   {
@@ -31,18 +32,6 @@ const features = [
   },
 ];
 
-function VideoPlaceholder({ title }: { title: string }) {
-  return (
-    <div className="w-full h-full min-h-[420px] rounded-lg border border-border bg-bg-card flex items-center justify-center overflow-hidden">
-      <div className="text-center">
-        <div className="w-12 h-12 rounded-full border-2 border-accent/30 flex items-center justify-center mx-auto mb-3">
-          <div className="w-0 h-0 border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent border-l-[14px] border-l-accent/50 ml-1" />
-        </div>
-        <p className="text-text-muted text-xs font-mono">{title}</p>
-      </div>
-    </div>
-  );
-}
 
 function useIsDesktop() {
   const [desktop, setDesktop] = useState(false);
@@ -120,7 +109,7 @@ export function CapabilitiesSection() {
               ))}
             </div>
             <div className="flex-1 min-w-0 hidden md:block">
-              <VideoPlaceholder title={features[active].title} />
+              <FeatureAnimation featureIndex={active} />
             </div>
           </div>
         </div>
