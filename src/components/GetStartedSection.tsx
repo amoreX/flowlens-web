@@ -83,14 +83,13 @@ export function GetStartedSection() {
       <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
         {/* Step 1: Paste your URL */}
         <motion.div variants={fadeUp}>
-          <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
+          <div className="border border-border rounded-xl p-6 bg-bg-card/30 h-full">
             <div className="flex items-center gap-3 mb-4">
               <StepNumber n={1} />
               <h3 className="font-serif font-semibold text-lg">Paste your URL</h3>
             </div>
-            <p className="text-text-muted text-sm leading-relaxed mb-5">
-              Open FlowLens and paste your app&apos;s URL. It loads in an embedded browser with
-              instrumentation auto-injected — no code changes needed.
+            <p className="text-text-muted text-sm leading-relaxed mb-5 md:min-h-[4.5rem]">
+              Paste your app&apos;s URL into FlowLens. It loads in an embedded browser with auto-injected instrumentation.
             </p>
             <div className="border border-border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-elevated/50">
@@ -106,12 +105,12 @@ export function GetStartedSection() {
 
         {/* Step 2: Add backend (optional) */}
         <motion.div variants={fadeUp}>
-          <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
+          <div className="border border-border rounded-xl p-6 bg-bg-card/30 h-full">
             <div className="flex items-center gap-3 mb-4">
               <StepNumber n={2} />
               <h3 className="font-serif font-semibold text-lg">Add backend tracing</h3>
             </div>
-            <p className="text-text-muted text-sm leading-relaxed mb-5">
+            <p className="text-text-muted text-sm leading-relaxed mb-5 md:min-h-[4.5rem]">
               Install <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">@nihal/flowlens-node</code> to
               correlate server-side spans with frontend traces.
             </p>
@@ -144,12 +143,12 @@ export function GetStartedSection() {
 
         {/* Step 3: Wire up middleware */}
         <motion.div variants={fadeUp}>
-          <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
+          <div className="border border-border rounded-xl p-6 bg-bg-card/30 h-full">
             <div className="flex items-center gap-3 mb-4">
               <StepNumber n={3} />
               <h3 className="font-serif font-semibold text-lg">Wire up middleware</h3>
             </div>
-            <p className="text-text-muted text-sm leading-relaxed mb-5">
+            <p className="text-text-muted text-sm leading-relaxed mb-5 md:min-h-[4.5rem]">
               Add the middleware to your Express, Fastify, or raw HTTP server. CORS must allow the trace header.
             </p>
             <div className="border border-border rounded-lg overflow-hidden">

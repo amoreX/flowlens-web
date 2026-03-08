@@ -28,7 +28,20 @@ export function Sidebar({ items }: { items: SidebarItem[] }) {
       if (el) observer.observe(el);
     }
 
-    return () => observer.disconnect();
+    // When scrolled to page bottom, activate the last item
+    function onScroll() {
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      if (docHeight - scrollBottom < 40) {
+        setActiveId(items[items.length - 1].id);
+      }
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [items]);
 
   const activeIndex = items.findIndex((item) => item.id === activeId);

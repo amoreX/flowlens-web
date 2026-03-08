@@ -2,12 +2,36 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function highlight(code: string): string {
-  return code
-    .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
-    .replace(/\b(import|from|export|const|let|var|if|else|return|function|async|await|new|true|false|default|interface)\b/g, '<span class="keyword">$1</span>')
-    .replace(/(["'`])(?:(?!\1).)*?\1/g, '<span class="string">$&</span>')
-    .replace(/\b([a-zA-Z_]\w*)\s*\(/g, '<span class="fn">$1</span>(');
+  const tokens: string[] = [];
+  const placeholder = (html: string): string => {
+    const idx = tokens.length;
+    tokens.push(html);
+    return `\x00${idx}\x00`;
+  };
+
+  let result = code;
+
+  // 1. Comments first
+  result = result.replace(/(\/\/.*)/g, (m) => placeholder(`<span class="comment">${escapeHtml(m)}</span>`));
+
+  // 2. Strings second (before keywords, so keywords inside strings aren't matched)
+  result = result.replace(/(["'`])(?:(?!\1).)*?\1/g, (m) => placeholder(`<span class="string">${escapeHtml(m)}</span>`));
+
+  // 3. Keywords (only in non-token text)
+  result = result.replace(/\b(import|from|export|const|let|var|if|else|return|function|async|await|new|true|false|default|interface)\b/g, '<span class="keyword">$1</span>');
+
+  // 4. Function calls
+  result = result.replace(/\b([a-zA-Z_]\w*)\s*\(/g, '<span class="fn">$1</span>(');
+
+  // Restore tokens
+  result = result.replace(/\x00(\d+)\x00/g, (_, idx) => tokens[Number(idx)]);
+
+  return result;
 }
 
 export function CodeBlock({ code, language }: { code: string; language?: string }) {
