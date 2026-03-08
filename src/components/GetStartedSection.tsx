@@ -18,19 +18,18 @@ const stagger = {
 type PkgManager = "npm" | "yarn" | "pnpm";
 
 const installCmds: Record<PkgManager, string> = {
-  npm: "npm i @nihal/flowlens-web @nihal/flowlens-node",
-  yarn: "yarn add @nihal/flowlens-web @nihal/flowlens-node",
-  pnpm: "pnpm add @nihal/flowlens-web @nihal/flowlens-node",
+  npm: "npm i @nihal/flowlens-node",
+  yarn: "yarn add @nihal/flowlens-node",
+  pnpm: "pnpm add @nihal/flowlens-node",
 };
 
-const initCode = `import { init } from "@nihal/flowlens-web";
+const nodeCode = `import cors from "cors";
+import { flowlens } from "@nihal/flowlens-node";
 
-// In your app's entry point
-init();`;
-
-const nodeCode = `import { flowlens } from "@nihal/flowlens-node";
-
-// Wrap your Express handler
+app.use(cors({
+  origin: true,
+  allowedHeaders: ["Content-Type", "X-FlowLens-Trace-Id"]
+}));
 app.use(flowlens({ serviceName: "my-api" }));`;
 
 function CopyButton({ text }: { text: string }) {
@@ -82,16 +81,39 @@ export function GetStartedSection() {
       </motion.p>
 
       <motion.div variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
-        {/* Step 1: Install */}
+        {/* Step 1: Paste your URL */}
         <motion.div variants={fadeUp}>
           <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
             <div className="flex items-center gap-3 mb-4">
               <StepNumber n={1} />
-              <h3 className="font-serif font-semibold text-lg">Install the packages</h3>
+              <h3 className="font-serif font-semibold text-lg">Paste your URL</h3>
             </div>
             <p className="text-text-muted text-sm leading-relaxed mb-5">
-              Start by installing <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">@nihal/flowlens-web</code> and{" "}
-              <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">@nihal/flowlens-node</code> in your project.
+              Open FlowLens and paste your app&apos;s URL. It loads in an embedded browser with
+              instrumentation auto-injected — no code changes needed.
+            </p>
+            <div className="border border-border rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-elevated/50">
+                <span className="text-[10px] font-mono text-text-dim uppercase tracking-wider">flowlens</span>
+              </div>
+              <div className="px-4 py-3 font-mono text-sm text-text-muted overflow-x-auto scrollbar-none">
+                <span className="text-text-dim select-none">URL: </span>
+                <span className="text-accent">http://localhost:3000</span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Step 2: Add backend (optional) */}
+        <motion.div variants={fadeUp}>
+          <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
+            <div className="flex items-center gap-3 mb-4">
+              <StepNumber n={2} />
+              <h3 className="font-serif font-semibold text-lg">Add backend tracing</h3>
+            </div>
+            <p className="text-text-muted text-sm leading-relaxed mb-5">
+              Install <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">@nihal/flowlens-node</code> to
+              correlate server-side spans with frontend traces.
             </p>
             <div className="border border-border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-elevated/50">
@@ -120,66 +142,35 @@ export function GetStartedSection() {
           </div>
         </motion.div>
 
-        {/* Step 2: Add to your app */}
-        <motion.div variants={fadeUp}>
-          <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
-            <div className="flex items-center gap-3 mb-4">
-              <StepNumber n={2} />
-              <h3 className="font-serif font-semibold text-lg">Add to your app</h3>
-            </div>
-            <p className="text-text-muted text-sm leading-relaxed mb-5">
-              Import and call <code className="text-accent text-xs bg-accent/10 px-1.5 py-0.5 rounded">init()</code> in
-              your frontend entry point.
-            </p>
-            <div className="border border-border rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-elevated/50">
-                <span className="text-[10px] font-mono text-text-dim uppercase tracking-wider">frontend</span>
-                <CopyButton text={initCode} />
-              </div>
-              <pre className="px-4 py-3 font-mono text-xs leading-relaxed overflow-x-auto scrollbar-none">
-                <code>
-                  <span className="text-pink-400">import</span>{" "}
-                  <span className="text-text">{"{ init }"}</span>{" "}
-                  <span className="text-pink-400">from</span>{" "}
-                  <span className="text-green-400">{'"@nihal/flowlens-web"'}</span>
-                  <span className="text-text-dim">;</span>
-                  {"\n\n"}
-                  <span className="text-text-dim">{"// In your app's entry point"}</span>
-                  {"\n"}
-                  <span className="text-blue-400">init</span>
-                  <span className="text-text-dim">();</span>
-                </code>
-              </pre>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Step 3: Open FlowLens */}
+        {/* Step 3: Wire up middleware */}
         <motion.div variants={fadeUp}>
           <div className="border border-border rounded-xl p-6 h-full bg-bg-card/30">
             <div className="flex items-center gap-3 mb-4">
               <StepNumber n={3} />
-              <h3 className="font-serif font-semibold text-lg">Open FlowLens</h3>
+              <h3 className="font-serif font-semibold text-lg">Wire up middleware</h3>
             </div>
             <p className="text-text-muted text-sm leading-relaxed mb-5">
-              Launch the desktop app and click <strong className="text-text">SDK Mode</strong>. Your
-              app connects automatically via WebSocket.
+              Add the middleware to your Express, Fastify, or raw HTTP server. CORS must allow the trace header.
             </p>
             <div className="border border-border rounded-lg overflow-hidden">
               <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-elevated/50">
-                <span className="text-[10px] font-mono text-text-dim uppercase tracking-wider">backend (optional)</span>
+                <span className="text-[10px] font-mono text-text-dim uppercase tracking-wider">backend</span>
                 <CopyButton text={nodeCode} />
               </div>
               <pre className="px-4 py-3 font-mono text-xs leading-relaxed overflow-x-auto scrollbar-none">
                 <code>
+                  <span className="text-pink-400">import</span>{" "}
+                  <span className="text-text">cors</span>{" "}
+                  <span className="text-pink-400">from</span>{" "}
+                  <span className="text-green-400">{'"cors"'}</span>
+                  <span className="text-text-dim">;</span>
+                  {"\n"}
                   <span className="text-pink-400">import</span>{" "}
                   <span className="text-text">{"{ flowlens }"}</span>{" "}
                   <span className="text-pink-400">from</span>{" "}
                   <span className="text-green-400">{'"@nihal/flowlens-node"'}</span>
                   <span className="text-text-dim">;</span>
                   {"\n\n"}
-                  <span className="text-text-dim">{"// Wrap your Express handler"}</span>
-                  {"\n"}
                   <span className="text-text">app</span>
                   <span className="text-text-dim">.</span>
                   <span className="text-blue-400">use</span>
@@ -194,10 +185,10 @@ export function GetStartedSection() {
               </pre>
             </div>
             <Link
-              href="/docs"
+              href="/sdk"
               className="inline-flex items-center gap-1.5 text-accent text-sm mt-5 hover:underline cursor-pointer"
             >
-              Full documentation <ExternalLink size={12} />
+              Full SDK reference <ExternalLink size={12} />
             </Link>
           </div>
         </motion.div>

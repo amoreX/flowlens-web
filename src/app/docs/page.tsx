@@ -8,7 +8,8 @@ const sidebarItems = [
   { id: "architecture", label: "Architecture" },
   { id: "data-flow", label: "Data Flow" },
   { id: "event-types", label: "Event Types" },
-  { id: "modes", label: "Modes" },
+  { id: "element-inspector", label: "Element Inspector" },
+  { id: "backend-tracing", label: "Backend Tracing" },
   { id: "quick-setup", label: "Quick Setup" },
   { id: "sdk-reference", label: "SDK Reference" },
 ];
@@ -31,12 +32,8 @@ export default function DocsPage() {
             <div className="space-y-4 text-sm leading-relaxed">
               <p>Install dependencies and start the development server:</p>
               <CodeBlock language="bash" code={`npm install\nnpm run dev`} />
-              <p className="text-text-muted">This builds the web SDK bundle first, then starts Electron in dev mode with hot reload.</p>
-              <p>Once running, you have two options:</p>
-              <ul className="list-none space-y-2 text-text-muted">
-                <li><span className="text-accent mr-2">1.</span> <strong className="text-text">Paste a URL</strong> — FlowLens loads your app in an embedded browser and auto-injects instrumentation.</li>
-                <li><span className="text-accent mr-2">2.</span> <strong className="text-text">Click SDK Mode</strong> — Instrument your own app with the web and node packages.</li>
-              </ul>
+              <p className="text-text-muted">This builds the instrumentation bundle first, then starts Electron in dev mode with hot reload.</p>
+              <p>Once running, paste your app&apos;s URL (e.g. <code className="text-secondary">http://localhost:3000</code>) into the onboarding screen. FlowLens loads your app in an embedded browser and auto-injects instrumentation — zero frontend code changes required.</p>
             </div>
           </section>
 
@@ -45,8 +42,8 @@ export default function DocsPage() {
             <div className="space-y-4 text-sm leading-relaxed">
               <p>FlowLens has three Electron processes:</p>
               <div className="border border-border p-5 rounded-lg space-y-3 text-text-muted">
-                <div><strong className="text-text">Main process</strong> — Owns the TraceCorrelationEngine (500-trace LRU), source file fetcher, backend span collector (HTTP on :9229), WebSocket server (:9230 for SDK mode), and IPC handler registry.</div>
-                <div><strong className="text-text">Target view</strong> — Sandboxed WebContentsView that loads the user&apos;s URL. Injects the browser bundle from <code className="text-secondary">@nihal/flowlens-web</code> on page load.</div>
+                <div><strong className="text-text">Main process</strong> — Owns the TraceCorrelationEngine (500-trace LRU), source file fetcher, backend span collector (HTTP on :9229), WebSocket server (:9230 for event ingestion), and IPC handler registry.</div>
+                <div><strong className="text-text">Target view</strong> — Sandboxed WebContentsView that loads the user&apos;s URL. Auto-injects the instrumentation bundle on page load and supports element inspection.</div>
                 <div><strong className="text-text">Renderer</strong> — React UI showing timeline, source code panel, console, and inspector. Subscribes to live event stream from main.</div>
               </div>
             </div>
@@ -55,8 +52,8 @@ export default function DocsPage() {
           <section id="data-flow">
             <h2 className="font-serif text-xl font-bold mb-6">Data Flow</h2>
             <div className="space-y-4 text-sm leading-relaxed">
-              <CodeBlock language="text" code={`@nihal/flowlens-web  ──WS :9230──▶  ws-server.ts  ──┐\n                                                 ├──▶ trace-engine ──▶ renderer\n@nihal/flowlens-node ──HTTP :9229─▶  span-collector ─┘`} />
-              <p className="text-text-muted">Both frontend events and backend spans are correlated by <code className="text-secondary">traceId</code>, which is propagated via the <code className="text-secondary">X-FlowLens-Trace-Id</code> header.</p>
+              <CodeBlock language="text" code={`Embedded page (auto-injected)  ──WS :9230──▶  ws-server.ts  ──┐\n                                                              ├──▶ trace-engine ──▶ renderer\n@nihal/flowlens-node           ──HTTP :9229─▶  span-collector ─┘`} />
+              <p className="text-text-muted">Both frontend events and backend spans are correlated by <code className="text-secondary">traceId</code>, which is propagated via the <code className="text-secondary">X-FlowLens-Trace-Id</code> header injected into all outgoing fetch/XHR requests.</p>
             </div>
           </section>
 
@@ -81,24 +78,27 @@ export default function DocsPage() {
             </div>
           </section>
 
-          <section id="modes">
-            <h2 className="font-serif text-xl font-bold mb-6">Modes</h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left">
-                    <th className="py-3 pr-4 text-text-muted font-normal">Topic</th>
-                    <th className="py-3 pr-4 text-accent font-normal">Embedded</th>
-                    <th className="py-3 text-secondary font-normal">SDK</th>
-                  </tr>
-                </thead>
-                <tbody className="text-text-muted">
-                  <tr className="border-b border-border"><td className="py-3 pr-4 text-text">Frontend</td><td className="py-3 pr-4">Auto-injected browser bundle</td><td className="py-3">You call <code className="text-secondary">init()</code></td></tr>
-                  <tr className="border-b border-border"><td className="py-3 pr-4 text-text">Backend</td><td className="py-3 pr-4">Optional manual integration</td><td className="py-3"><code className="text-secondary">@nihal/flowlens-node</code> middleware</td></tr>
-                  <tr className="border-b border-border"><td className="py-3 pr-4 text-text">Layout</td><td className="py-3 pr-4">Split view with embedded page</td><td className="py-3">Full-width tracing UI</td></tr>
-                  <tr><td className="py-3 pr-4 text-text">Transport</td><td className="py-3 pr-4">WS + IPC in desktop app</td><td className="py-3">WS (web) + HTTP (node)</td></tr>
-                </tbody>
-              </table>
+          <section id="element-inspector">
+            <h2 className="font-serif text-xl font-bold mb-6">Element Inspector</h2>
+            <div className="space-y-4 text-sm leading-relaxed text-text-muted">
+              <p>Click the <strong className="text-text">Inspect</strong> button in the target toolbar to activate the element inspector. Hover over any element in the embedded page to see:</p>
+              <ul className="list-none space-y-2">
+                <li><span className="text-accent mr-2">&bull;</span> Tag name, classes, and dimensions</li>
+                <li><span className="text-accent mr-2">&bull;</span> React component name (if applicable)</li>
+                <li><span className="text-accent mr-2">&bull;</span> Source file location of the component</li>
+              </ul>
+              <p>Click an element to navigate directly to its component&apos;s source file in the source code panel.</p>
+            </div>
+          </section>
+
+          <section id="backend-tracing">
+            <h2 className="font-serif text-xl font-bold mb-6">Backend Tracing</h2>
+            <div className="space-y-4 text-sm leading-relaxed text-text-muted">
+              <p>Install <code className="text-secondary">@nihal/flowlens-node</code> in your backend to correlate server-side spans with frontend traces. The middleware reads the <code className="text-secondary">X-FlowLens-Trace-Id</code> header and reports spans back to FlowLens.</p>
+              <CodeBlock language="bash" code="npm install @nihal/flowlens-node" />
+              <p>CORS must allow the trace header for cross-origin requests:</p>
+              <CodeBlock language="typescript" code={`import cors from 'cors'\nimport { flowlens } from '@nihal/flowlens-node'\n\napp.use(cors({\n  origin: true,\n  allowedHeaders: ['Content-Type', 'X-FlowLens-Trace-Id']\n}))\napp.use(flowlens({ serviceName: 'my-api' }))`} />
+              <p>Each backend span appears as three events in the timeline: <strong className="text-text">ingress</strong>, <strong className="text-text">route-handler</strong>, and <strong className="text-text">egress</strong>. Zero overhead when the trace header is absent.</p>
             </div>
           </section>
 
@@ -107,10 +107,9 @@ export default function DocsPage() {
             <div className="space-y-4 text-sm leading-relaxed">
               <ol className="list-none space-y-3 text-text-muted">
                 <li><span className="text-accent mr-2">1.</span> Start FlowLens desktop: <code className="text-secondary">npm run dev</code></li>
-                <li><span className="text-accent mr-2">2.</span> Frontend: install <code className="text-secondary">@nihal/flowlens-web</code>, call <code className="text-secondary">init()</code> in dev</li>
-                <li><span className="text-accent mr-2">3.</span> Backend: install <code className="text-secondary">@nihal/flowlens-node</code>, attach middleware</li>
-                <li><span className="text-accent mr-2">4.</span> In FlowLens onboarding, click <strong className="text-text">SDK Mode</strong></li>
-                <li><span className="text-accent mr-2">5.</span> Use your app — traces appear with frontend + backend events correlated</li>
+                <li><span className="text-accent mr-2">2.</span> Paste your frontend URL (e.g. <code className="text-secondary">http://localhost:3000</code>) — instrumentation is injected automatically</li>
+                <li><span className="text-accent mr-2">3.</span> (Optional) Backend: install <code className="text-secondary">@nihal/flowlens-node</code>, attach middleware with CORS headers</li>
+                <li><span className="text-accent mr-2">4.</span> Use your app — traces appear with frontend + backend events correlated</li>
               </ol>
             </div>
           </section>
@@ -119,8 +118,8 @@ export default function DocsPage() {
             <h2 className="font-serif text-xl font-bold mb-6">SDK Reference</h2>
             <Link href="/sdk" className="border border-border p-5 rounded-lg card-hover flex items-center justify-between cursor-pointer">
               <div>
-                <h3 className="font-serif font-semibold text-sm">FlowLens SDKs</h3>
-                <p className="text-text-muted text-xs mt-1">@nihal/flowlens-web (frontend) &amp; @nihal/flowlens-node (backend)</p>
+                <h3 className="font-serif font-semibold text-sm">@nihal/flowlens-node</h3>
+                <p className="text-text-muted text-xs mt-1">Backend span collection SDK — Express, Fastify, and raw HTTP adapters</p>
               </div>
               <ArrowRight size={16} className="text-accent" />
             </Link>

@@ -34,7 +34,7 @@ export function HeroSection() {
           </motion.h1>
           <motion.p variants={fadeUp} className="text-text-muted text-base max-w-md leading-relaxed mb-10">
             An Electron desktop tool that captures every UI event, network call, console log,
-            and error — correlating frontend and backend in a unified trace timeline.
+            and error — zero code changes required. Correlates frontend and backend in a unified trace timeline.
           </motion.p>
           <motion.div variants={fadeUp} className="flex flex-wrap gap-4">
             <Link href="/docs"

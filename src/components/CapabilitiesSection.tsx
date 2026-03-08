@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
-import { Zap, GitBranch, Code2, Terminal } from "lucide-react";
+import { Zap, GitBranch, Code2, Terminal, MousePointer } from "lucide-react";
 
 const features = [
   {
@@ -13,6 +13,11 @@ const features = [
     icon: <GitBranch size={18} />,
     title: "Full-Stack Correlation",
     desc: "X-FlowLens-Trace-Id header propagates from frontend to backend, linking UI events to API calls in one timeline.",
+  },
+  {
+    icon: <MousePointer size={18} />,
+    title: "Element Inspector",
+    desc: "Hover over elements in the embedded page to see tag, classes, dimensions, and React component name. Click to jump to source.",
   },
   {
     icon: <Code2 size={18} />,
