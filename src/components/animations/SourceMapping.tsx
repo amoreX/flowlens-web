@@ -33,15 +33,15 @@ export function SourceMapping1() {
   ];
   return (
     <AnimContainer>
-      <div className="flex gap-3 h-full">
-        <div className="w-32 shrink-0 space-y-1.5">
-          <div className="text-[8px] font-mono text-text-dim mb-1">Events</div>
+      <div className="flex gap-3 flex-1 min-h-0">
+        <div className="w-36 shrink-0 space-y-2">
+          <div className="text-[10px] font-mono text-text-dim mb-1.5">Events</div>
           {events.map((e, i) => (
-            <div key={i} className={`flex items-center gap-1 transition-all duration-300 ${f >= e.at ? "opacity-100" : "opacity-30"}`}>
-              <EventDot type={e.type} size={5} />
-              <span className={`text-[8px] font-mono ${activeEvent === e ? "text-accent" : "text-text-muted"}`}>{e.label}</span>
+            <div key={i} className={`flex items-center gap-1.5 transition-all duration-300 ${f >= e.at ? "opacity-100" : "opacity-30"}`}>
+              <EventDot type={e.type} size={6} />
+              <span className={`text-[10px] font-mono ${activeEvent === e ? "text-accent" : "text-text-muted"}`}>{e.label}</span>
               {activeEvent === e && (
-                <svg width="8" height="6" className="text-accent ml-auto shrink-0" viewBox="0 0 8 6">
+                <svg width="10" height="8" className="text-accent ml-auto shrink-0" viewBox="0 0 8 6">
                   <path d="M0 3H6M4 1L7 3L4 5" stroke="currentColor" fill="none" strokeWidth="1" />
                 </svg>
               )}
@@ -49,7 +49,7 @@ export function SourceMapping1() {
           ))}
         </div>
         <MiniWindow title="src/App.tsx" className="flex-1">
-          <div className="py-1 min-h-[340px]">
+          <div className="py-1.5 h-full overflow-auto">
             {code.map((line, i) => (
               <CodeLine key={i} num={line.num} code={line.code}
                 highlighted={activeEvent ? line.num === activeEvent.line : false}

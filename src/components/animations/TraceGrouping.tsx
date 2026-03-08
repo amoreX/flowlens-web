@@ -32,33 +32,33 @@ export function TraceGrouping8() {
   const clickingSubmit   = f >= 0 && f <= 1;
   const clickingLoadMore = f >= 7 && f <= 8;
   const clickingDelete   = f >= 12 && f <= 13;
-  const cursorY = f < 7 ? 48 : f < 12 ? 82 : 116;
+  const cursorY = f < 7 ? 52 : f < 12 ? 96 : 140;
   const isClicking = f === 1 || f === 8 || f === 13;
   const activeTrace = f < 7 ? 0 : f < 12 ? 1 : 2;
 
   return (
     <AnimContainer>
-      <div className="flex gap-3 h-full">
+      <div className="flex gap-3 flex-1 min-h-0">
         <MiniWindow title="localhost:3000" className="w-[38%] shrink-0">
-          <div className="p-3 space-y-2 relative min-h-[340px]">
-            <div className="text-[10px] font-mono text-text-muted mb-1">My App</div>
-            <div className={`px-3 py-1.5 rounded text-[9px] font-mono border transition-all duration-200 ${
+          <div className="p-4 space-y-3 relative h-full">
+            <div className="text-[12px] font-mono text-text-muted mb-2">My App</div>
+            <div className={`px-4 py-2 rounded text-[11px] font-mono border transition-all duration-200 ${
               clickingSubmit ? "bg-accent/20 border-accent text-accent scale-[0.97]" : "bg-bg-elevated border-border text-text-muted"
             }`}>Submit</div>
-            <div className={`px-3 py-1.5 rounded text-[9px] font-mono border transition-all duration-200 ${
+            <div className={`px-4 py-2 rounded text-[11px] font-mono border transition-all duration-200 ${
               clickingLoadMore ? "bg-accent/20 border-accent text-accent scale-[0.97]" : "bg-bg-elevated border-border text-text-muted"
             }`}>Load More</div>
-            <div className={`px-3 py-1.5 rounded text-[9px] font-mono border transition-all duration-200 ${
-              clickingDelete ? "bg-red-500/20 border-red-500/40 text-red-400 scale-[0.97]" : "bg-bg-elevated border-border text-text-muted"
+            <div className={`px-4 py-2 rounded text-[11px] font-mono border transition-all duration-200 ${
+              clickingDelete ? "bg-red-500/20 border-red-500/40 text-red-500 scale-[0.97]" : "bg-bg-elevated border-border text-text-muted"
             }`}>Delete</div>
-            <Cursor x={40} y={cursorY} clicking={isClicking} />
+            <Cursor x={50} y={cursorY} clicking={isClicking} />
           </div>
         </MiniWindow>
 
         <MiniWindow title="traces" className="flex-1">
-          <div className="min-h-[340px]">
+          <div className="h-full overflow-auto">
             {Object.keys(traceGroups).length === 0 && (
-              <div className="flex items-center justify-center h-32 text-[9px] text-text-dim font-mono">
+              <div className="flex items-center justify-center h-32 text-[11px] text-text-dim font-mono">
                 waiting for events...
               </div>
             )}
@@ -69,14 +69,14 @@ export function TraceGrouping8() {
               return (
                 <TraceRow key={idx} label={`Trace #${traceNum + 1} · ${traceLabels[traceNum]}`}
                   count={events.length} active={isActive}>
-                  <div className="space-y-0.5 py-0.5">
+                  <div className="space-y-1 py-0.5">
                     {events.map((e, j) => {
                       const isLatest = isActive && j === events.length - 1;
                       return (
-                        <div key={j} className={`flex items-center gap-1.5 ${j === events.length - 1 ? "animate-[fadeIn_0.25s_ease]" : ""}`}>
-                          <EventDot type={e.type} size={isLatest ? 6 : 4} />
-                          <span className={`text-[8px] font-mono ${isLatest ? "text-text" : "text-text-muted/70"}`}>{e.label}</span>
-                          {isLatest && <span className="text-[7px] text-accent font-mono ml-auto animate-pulse">new</span>}
+                        <div key={j} className={`flex items-center gap-2 ${j === events.length - 1 ? "animate-[fadeIn_0.25s_ease]" : ""}`}>
+                          <EventDot type={e.type} size={isLatest ? 7 : 5} />
+                          <span className={`text-[10px] font-mono ${isLatest ? "text-text" : "text-text-muted/70"}`}>{e.label}</span>
+                          {isLatest && <span className="text-[9px] text-accent font-mono ml-auto animate-pulse">new</span>}
                         </div>
                       );
                     })}

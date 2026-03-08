@@ -16,7 +16,7 @@ const animations = [
 export function FeatureAnimation({ featureIndex }: { featureIndex: number }) {
   const Component = animations[featureIndex] || animations[0];
   return (
-    <div className="w-full h-full min-h-[420px]">
+    <div className="w-full h-full">
       <Component />
     </div>
   );
